@@ -1,0 +1,9 @@
+{
+  "additionalFiles": "..\\..,..\\..,..\\..,..\\..,..\\..,..\\..,..\\..,..\\..,..\\..,..\\..,..\\..,..\\..,..\\..,..\\..,..\\..,..\\..\\..",
+  "compiler.optimization_flags": "-Os",
+  "customBuildProperties": "",
+  "fqbn": "esp32:esp32:XIAO_ESP32C6:CDCOnBoot=cdc,PartitionScheme=default",
+  "hardwareFolders": "R:\\.arduino-local\\data\\packages\\esp32\\hardware\\esp32\\3.3.12,R:\\.arduino-local\\data\\packages\\esp32\\hardware\\esp32\\3.3.12",
+  "otherLibrariesFolders": "R:\\.arduino-local\\user\\libraries",
+  "sketchLocation": "R:\\StressMonitorBLE-Uhr-Display\\StressMonitorBLE"
+}

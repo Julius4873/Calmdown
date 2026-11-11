@@ -9,7 +9,7 @@ import {
 } from './protocol.js';
 
 function makeMeasurement({
-  flags = 0b0010_0111,
+  flags = 0b0011_0111,
   packetCount = 0x1234,
   uptimeMs = 0x12345678,
   heartRate = 723,
@@ -49,7 +49,6 @@ test('decodes the 20-byte little-endian measurement packet', () => {
   assert.equal(measurement.respirationRate, 16.5);
   assert.equal(measurement.maxFresh, true);
   assert.equal(measurement.warning, false);
-  assert.equal(measurement.breathAssist, false);
   assert.equal(measurement.demo, true);
   assert.equal(measurement.packetCount, 0x1234);
   assert.equal(measurement.uptimeMs, 0x12345678);

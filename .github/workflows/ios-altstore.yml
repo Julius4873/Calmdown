@@ -1,0 +1,69 @@
+name: Calmdown AltStore IPA
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: App version
+        required: true
+        default: '1.0'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: calmdown-altstore
+  cancel-in-progress: false
+
+jobs:
+  build-ipa:
+    # Standard runners are free for public repositories. Keep private builds
+    # disabled so this workflow cannot consume a paid private-runner allowance.
+    if: ${{ !github.event.repository.private }}
+    runs-on: macos-26
+    timeout-minutes: 45
+    defaults:
+      run:
+        working-directory: PanicWearable/android-ios-app
+        shell: bash
+    env:
+      RELEASE_VERSION: ${{ inputs.version }}
+      BUILD_NUMBER: ${{ github.run_number }}.${{ github.run_attempt }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+      - name: Build web assets and synchronize iOS
+        run: |
+          set -euo pipefail
+          [[ "$RELEASE_VERSION" =~ ^[0-9]+\.[0-9]+(\.[0-9]+)?$ ]] || { echo 'Invalid version.'; exit 1; }
+          npm ci
+          npm run build
+          npx cap sync ios
+          sips -s format png --resampleHeightWidth 1024 1024 \
+            public/calmdown-logo-sage.png \
+            --out ios/App/App/Assets.xcassets/AppIcon.appiconset/AppIcon-512@2x.png
+      - name: Archive for a physical iPhone
+        run: |
+          set -euo pipefail
+          xcodebuild -project ios/App/App.xcodeproj -scheme App -configuration Release \
+            -destination 'generic/platform=iOS' -archivePath "$RUNNER_TEMP/Calmdown-AltStore.xcarchive" \
+            MARKETING_VERSION="$RELEASE_VERSION" CURRENT_PROJECT_VERSION="$BUILD_NUMBER" \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY='' archive
+      - name: Package IPA for AltStore signing
+        run: |
+          set -euo pipefail
+          APP="$RUNNER_TEMP/Calmdown-AltStore.xcarchive/Products/Applications/App.app"
+          [[ -d "$APP" ]] || { echo 'Device app was not produced.'; exit 1; }
+          mkdir -p "$RUNNER_TEMP/calmdown-altstore/Payload"
+          ditto "$APP" "$RUNNER_TEMP/calmdown-altstore/Payload/Calmdown.app"
+          cd "$RUNNER_TEMP/calmdown-altstore"
+          ditto -c -k --keepParent Payload Calmdown-AltStore.ipa
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Calmdown-AltStore-${{ github.run_number }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/calmdown-altstore/Calmdown-AltStore.ipa
+          if-no-files-found: error
+          retention-days: 1
+          compression-level: 0

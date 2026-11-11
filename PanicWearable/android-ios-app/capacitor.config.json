@@ -1,5 +1,15 @@
 {
-  "appId": "de.panicwearable.app",
-  "appName": "PanicWearable",
-  "webDir": "dist"
+  "appId": "de.calmdown.wearable",
+  "appName": "Calmdown",
+  "webDir": "dist",
+  "plugins": {
+    "BluetoothLe": {
+      "displayStrings": {
+        "scanning": "Suche StressMonitor …",
+        "cancel": "Abbrechen",
+        "availableDevices": "Verfügbare Geräte",
+        "noDeviceFound": "Kein StressMonitor gefunden"
+      }
+    }
+  }
 }

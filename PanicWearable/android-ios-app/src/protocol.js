@@ -50,7 +50,6 @@ export function decodeMeasurement(dataView) {
     respirationRate,
     maxFresh: (flags & (1 << 0)) !== 0,
     warning: (flags & (1 << 3)) !== 0,
-    breathAssist: (flags & (1 << 4)) !== 0,
     demo: (flags & (1 << 5)) !== 0,
     packetCount: dataView.getUint16(2, true),
     uptimeMs: dataView.getUint32(4, true),
